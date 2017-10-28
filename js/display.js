@@ -14,7 +14,7 @@ function init() {
   // CAMERA
   camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight,
     1, 10000);
-  camera.position.set(1, 5, 5);
+  camera.position.set(0, 5, 0);
   scene.add(camera);
 
   // RENDERER
@@ -71,8 +71,8 @@ function init() {
   scene.add(flrmesh);
 
   // sky
-  var skygeo = new THREE.SphereGeometry(10000, 0, 0);
-  var skytex = texloader.load('../textures/night.jpg');
+  var skygeo = new THREE.SphereGeometry(10000, 32, 32);
+  var skytex = texloader.load('../textures/sky.jpg');
   skytex.anistropy = renderer.getMaxAnistropy;
   var skymat = new THREE.MeshBasicMaterial({
     map: skytex
@@ -104,7 +104,7 @@ function init() {
     color: 0x00FF00
   });
   splmesh = new THREE.Mesh(splgeo, splmat);
-  splmesh.position.set(0, 0, 5);
+  splmesh.position.set(0, 5, 0);
   scene.add(splmesh);
   // spl
   var splgeo = new THREE.BoxGeometry(1, 1, 1);
@@ -112,12 +112,25 @@ function init() {
     color: 0x0000FF
   });
   splmesh = new THREE.Mesh(splgeo, splmat);
-  splmesh.position.set(0, 5, 0);
+  splmesh.position.set(0, 0, 5);
   scene.add(splmesh);
+
+  // AUDIO
+  var listener = new THREE.AudioListener();
+  camera.add(listener);
+  var sound = new THREE.PositionalAudio(listener);
+  var audioLoader = new THREE.AudioLoader();
+  audioLoader.load(
+    '../audio/dragon.mp3',
+    function(buffer) {
+      sound.setBuffer(buffer);
+      sound.setRefDistance(20);
+      // sound.play();
+    });
 
   // LIGHTING
 
-  var ambient = new THREE.AmbientLight(0x444444);
+  var ambient = new THREE.AmbientLight(0x404040);
   scene.add(ambient);
 
   var directionalLight = new THREE.DirectionalLight(0xffeedd);
@@ -126,20 +139,51 @@ function init() {
 
   // OBJECTS
   THREE.Loader.Handlers.add(/\.dds$/i, new THREE.DDSLoader());
-  var mtlLoader = new THREE.MTLLoader();
-  mtlLoader.setPath('./obj/male02/');
-  mtlLoader.load('male02_dds.mtl', function(materials) {
+  // man
+  var manmtlLoader = new THREE.MTLLoader();
+  manmtlLoader.setPath('./obj/male02/');
+  manmtlLoader.load('male02_dds.mtl', function(materials) {
     materials.preload();
-    var objLoader = new THREE.OBJLoader();
-    objLoader.setMaterials(materials);
-    objLoader.setPath('./obj/male02/');
-    objLoader.load('male02.obj', function(object) {
-      object.position.set(100, 10, 10);
-      object.scale.set(0.2, 0.2, 0.2);
-      objects.push(object);
+    var manobjLoader = new THREE.OBJLoader();
+    manobjLoader.setMaterials(materials);
+    manobjLoader.setPath('./obj/male02/');
+    manobjLoader.load('male02.obj', function(object) {
+      object.position.set(15, 0, 0);
+      object.scale.set(0.05, 0.05, 0.05);
+      object.rotation.y = -Math.PI / 2;
       scene.add(object);
+      objects.push(object);
     }, onProgress, onError);
   });
+  // radio
+  var radioobjloader = new THREE.OBJLoader();
+  radioobjloader.setPath('./obj/pocket/');
+  radioobjloader.load('RT711.obj', function(object) {
+    object.position.set(-10, 0, 0);
+    object.rotation.set(0, Math.PI / 2, 0);
+    object.scale.set(0.65, 0.65, 0.65);
+    object.add(sound);
+    scene.add(object);
+    objects.push(object);
+  }, onProgress, onError);
+  // man
+  var truckmtlloader = new THREE.MTLLoader();
+  truckmtlloader.setPath('./obj/red-pickup/');
+  truckmtlloader.load('pickup.mtl', function(materials) {
+    materials.preload();
+    var truckobjloader = new THREE.OBJLoader();
+    truckobjloader.setMaterials(materials);
+    truckobjloader.setPath('./obj/red-pickup/');
+    truckobjloader.load('pickup.obj', function(object) {
+      object.position.set(0, 0, 20);
+      object.scale.set(10, 10, 10);
+      scene.add(object);
+      object.position.set(-10, 0, 20);
+      scene.add(object);
+      objects.push(object);
+    }, onProgress, onError);
+  });
+
 
   // particle
   particleMaterial = new THREE.SpriteCanvasMaterial({
@@ -153,22 +197,6 @@ function init() {
 
   // EFFECT
   effect = new THREE.StereoEffect(renderer);
-
-  // AUDIO
-  var listener = new THREE.AudioListener();
-  camera.add(listener);
-  var sound = new THREE.PositionalAudio(listener);
-  var audioLoader = new THREE.AudioLoader();
-  audioLoader.load(
-    '../audio/dragon.mp3',
-    function(buffer) {
-      sound.setBuffer(buffer);
-      sound.setRefDistance(20);
-      // TODO temp
-      // sound.play();
-    });
-  // occurs after adding to scene in example
-  imgmesh.add(sound);
 
   // CONTROLS
   // LOOK AROUND

@@ -1,7 +1,7 @@
 # File produced by Open Asset Import Library (http://www.assimp.sf.net)
 # (assimp v3.1.187496374)
 
-mtllib Radio 5.obj.mtl
+mtllib radio.mtl
 
 # 1448 vertex positions
 v  66.1744 -100.89 139.063
@@ -6792,4 +6792,3 @@ f  1399/744/1377 1427/749/1405 1424/751/1402
 f  1047/685/1025 1045/683/1023 1042/680/1020
 f  1111/749/1089 1109/747/1087 1106/744/1084
 f  1113/751/1091 1111/749/1089 1106/744/1084
-

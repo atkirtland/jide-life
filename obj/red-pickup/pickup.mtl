@@ -1,0 +1,48 @@
+newmtl Details
+Ns 100
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+map_Kd PUDetails.jpg
+newmtl Engine
+Ns 100
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+map_Kd PUEngine.jpg
+newmtl Rubber
+Ns 100
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+map_Kd PURubber.jpg
+newmtl PaintWork
+Ns 100
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+map_Kd PUPaintWorK1.jpg
+newmtl GlassParts
+Ns 100
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+map_Kd PUGlassParts.jpg
+newmtl Windows
+Ns 50
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+map_Kd PUWindows.jpg
+newmtl Silver
+Ns 100
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+map_Kd PUSilver.jpg
+newmtl Chrome
+Ns 100
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+map_Kd PUChrome.jpg
