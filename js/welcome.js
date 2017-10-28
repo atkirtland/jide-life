@@ -7,7 +7,7 @@
     loop: true
   });
 
-  $("#spotify-login-button").hide();
+  $("#fbBtn").hide();
   $("#start3DViewBtn").hide();
 
   document.getElementById("start3DViewBtn").addEventListener("click", function(){

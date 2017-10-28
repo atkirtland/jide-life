@@ -73,7 +73,7 @@ var musicTopTracksPreviewList = [];
                       'Authorization': 'Bearer ' + access_token
                     },
                     success: function(response) {
-                        $("#start3DViewBtn").show();
+                        $("#fbBtn").show();
                         $("#spotify-login-button").hide();
                         $("#fbBtn").hide();
                         console.log(response);
