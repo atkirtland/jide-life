@@ -1,85 +1,159 @@
-var camera, scene, renderer;
+var camera;
 var imgmesh, splmesh, sprmesh;
 var element;
-var effect, controls;
+var effect;
 var imggeo, imgmesh;
-// used for touch events
-var objects = [];
 var imageiterator = 0;
+var sounditer = 0;
+var radioid;
+var audiolistener, sound, audioLoader;
 
-function init() {
+var renderer = new THREE.WebGLRenderer({
+  antialias: true
+});
+var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight,
+  1, 10000);
+var control = new THREE.OrbitControls(camera, element);
+var scene = new THREE.Scene();
+var origin = new THREE.Object3D();
 
-  // SCENE
-  scene = new THREE.Scene();
+var recLight, recLightHelper;
 
-  // CAMERA
-  camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight,
-    1, 10000);
-  camera.position.set(0, 5, 0);
-  scene.add(camera);
+var manager = new THREE.LoadingManager();
+var texloader = new THREE.TextureLoader(manager);
+var fontloader = new THREE.FontLoader(manager);
+fontloader.load('fonts/helvetiker_regular.typeface.json', function(font) {
+  init(font);
+  animate();
+});
 
+var canvas = document.createElement('canvas'),
+  ctx = canvas.getContext('2d'),
+  size = 256;
+
+function changeCanvas() {
+  ctx.font = '20pt Arial';
+  ctx.fillStyle = 'red';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = 'white';
+  ctx.fillRect(10, 10, canvas.width - 20, canvas.height - 20);
+  ctx.fillStyle = 'black';
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(new Date().getTime(), canvas.width / 2, canvas.height / 2);
+}
+
+function init(font) {
   // RENDERER
-  renderer = new THREE.WebGLRenderer();
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.gammaInput = true;
+  renderer.gammaOutput = true;
   element = renderer.domElement;
   document.body.appendChild(element);
 
+  // CAMERA
+  camera.position.set(0, 4, 0);
+  scene.add(camera);
+  scene.add(origin);
+
+  // WARNINGS
+  var gl = renderer.context;
+  // Check for float-RT support
+  // TODO (abelnation): figure out fall-back for float textures
+  if (!gl.getExtension('OES_texture_float')) {
+    alert('OES_texture_float not supported');
+    throw 'missing webgl extension';
+  }
+  if (!gl.getExtension('OES_texture_float_linear')) {
+    alert('OES_texture_float_linear not supported');
+    throw 'missing webgl extension';
+  }
+
+  // ORIGIN
+  scene.add(origin);
+
   // TEXTURES:
-  var manager = new THREE.LoadingManager();
   manager.onProgress = function(item, loaded, total) {
     console.log(item, loaded, total);
   };
 
-  var texloader = new THREE.TextureLoader(manager);
   // img
   var src = (arrOfWebpImages.length != 0) ? arrOfWebpImages[imageiterator][
       "webp_images"
     ][0]
     ["source"] : "../textures/dog.jpg";
   var imgtex = texloader.load(src);
-  var width = 192,
-    height = 108,
+  var width = 24,
+    height = 13.5,
     width_segments = 1,
     height_segments = 100;
   imggeo = new THREE.PlaneGeometry(width, height, width_segments,
     height_segments);
-  for (var i = 0; i < imggeo.vertices.length / 2; i++) {
-    imggeo.vertices[2 * i].z = Math.pow(2, i / 20);
-    imggeo.vertices[2 * i + 1].z = Math.pow(2, i / 20);
-  }
+  // for (var i = 0; i < imggeo.vertices.length / 2; i++) {
+  //   imggeo.vertices[2 * i].z = Math.pow(2, i / 20);
+  //   imggeo.vertices[2 * i + 1].z = Math.pow(2, i / 20);
+  // }
   // var imggeo = new THREE.PlaneBufferGeometry(192, 108);
-  var imgmat = new THREE.MeshBasicMaterial({
-    map: imgtex
+  var imgmat = new THREE.MeshStandardMaterial({
+    map: imgtex,
+    polygonOffset: true
   });
   imgmesh = new THREE.Mesh(imggeo, imgmat);
   // imgmesh.doubleSided = true;
   // imgmesh.rotation.y = Math.PI / 2 - 0.5;
   // 50 seems to push it up to the bottom edge
-  imgmesh.position.set(0, 50, -75);
+  imgmesh.position.set(0, 6, -24.9);
+  imgmesh.castShadow = true;
+  imgmesh.receiveShadow = true;
   scene.add(imgmesh);
-  objects.push(imgmesh);
 
 
   // floor flr
-  var flrtex = texloader.load('../textures/grass.jpg');
-  flrtex.wrapS = THREE.RepeatWrapping;
-  flrtex.wrapT = THREE.RepeatWrapping;
-  flrtex.repeat = new THREE.Vector2(50, 50);
-  flrtex.anistropy = renderer.getMaxAnistropy;
-  var flrmat = new THREE.MeshBasicMaterial({
-    map: flrtex
+  var floorMat = new THREE.MeshStandardMaterial({
+    roughness: 0.8,
+    color: 0xffffff,
+    metalness: 0.2,
+    bumpScale: 0.0005
   });
-  var flrgeo = new THREE.PlaneBufferGeometry(1000, 1000);
-  var flrmesh = new THREE.Mesh(flrgeo, flrmat);
-  flrmesh.rotation.x = -Math.PI / 2;
-  scene.add(flrmesh);
+  texloader.load("textures/hardwood2_diffuse.jpg", function(map) {
+    map.wrapS = THREE.RepeatWrapping;
+    map.wrapT = THREE.RepeatWrapping;
+    map.anisotropy = 4;
+    map.repeat.set(100, 100);
+    floorMat.map = map;
+    floorMat.needsUpdate = true;
+  });
+  texloader.load("textures/hardwood2_bump.jpg", function(map) {
+    map.wrapS = THREE.RepeatWrapping;
+    map.wrapT = THREE.RepeatWrapping;
+    map.anisotropy = 4;
+    map.repeat.set(100, 100);
+    floorMat.bumpMap = map;
+    floorMat.needsUpdate = true;
+  });
+  texloader.load("textures/hardwood2_roughness.jpg", function(map) {
+    map.wrapS = THREE.RepeatWrapping;
+    map.wrapT = THREE.RepeatWrapping;
+    map.anisotropy = 4;
+    map.repeat.set(100, 100);
+    floorMat.roughnessMap = map;
+    floorMat.needsUpdate = true;
+  });
+  var floorGeometry = new THREE.PlaneBufferGeometry(200, 200);
+  var floorMesh = new THREE.Mesh(floorGeometry, floorMat);
+  floorMesh.receiveShadow = true;
+  floorMesh.rotation.x = -Math.PI / 2.0;
+  scene.add(floorMesh);
+
 
   // sky
   var skygeo = new THREE.SphereGeometry(10000, 32, 32);
   var skytex = texloader.load('../textures/sky.jpg');
   skytex.anistropy = renderer.getMaxAnistropy;
-  var skymat = new THREE.MeshBasicMaterial({
+  var skymat = new THREE.MeshStandardMaterial({
     map: skytex
   });
   var skymesh = new THREE.Mesh(skygeo, skymat);
@@ -121,26 +195,18 @@ function init() {
   scene.add(splmesh);
 
   // AUDIO
-  var listener = new THREE.AudioListener();
-  camera.add(listener);
-  var sound = new THREE.PositionalAudio(listener);
-  var audioLoader = new THREE.AudioLoader();
+  audiolistener = new THREE.AudioListener();
+  camera.add(audiolistener);
+  sound = new THREE.PositionalAudio(audiolistener);
+  audioLoader = new THREE.AudioLoader();
+  var track = musicTopTracksPreviewList[sounditer];
   audioLoader.load(
-    '../audio/dragon.mp3',
+    track,
     function(buffer) {
       sound.setBuffer(buffer);
       sound.setRefDistance(20);
-      // sound.play();
+      sound.play();
     });
-
-  // LIGHTING
-
-  var ambient = new THREE.AmbientLight(0x404040);
-  scene.add(ambient);
-
-  var directionalLight = new THREE.DirectionalLight(0xffeedd);
-  directionalLight.position.set(0, 0, 1).normalize();
-  scene.add(directionalLight);
 
   // OBJECTS
   THREE.Loader.Handlers.add(/\.dds$/i, new THREE.DDSLoader());
@@ -153,25 +219,28 @@ function init() {
     manobjLoader.setMaterials(materials);
     manobjLoader.setPath('./obj/male02/');
     manobjLoader.load('male02.obj', function(object) {
-      object.position.set(15, 0, 0);
+      object.receiveShadow = true;
+      object.castShadow = true;
+      object.position.set(15, 0, 6);
       object.scale.set(0.05, 0.05, 0.05);
       object.rotation.y = -Math.PI / 2;
       scene.add(object);
-      objects.push(object);
     }, onProgress, onError);
   });
   // radio
   var radioobjloader = new THREE.OBJLoader();
   radioobjloader.setPath('./obj/pocket/');
   radioobjloader.load('RT711.obj', function(object) {
-    object.position.set(-10, 0, 0);
+    object.castShadow = true;
+    object.receiveShadow = true;
+    object.position.set(-20, 0, 0);
     object.rotation.set(0, Math.PI / 2, 0);
     object.scale.set(0.65, 0.65, 0.65);
     object.add(sound);
     scene.add(object);
-    objects.push(object);
+    radioid = object.uuid;
   }, onProgress, onError);
-  // man
+  // truck
   var truckmtlloader = new THREE.MTLLoader();
   truckmtlloader.setPath('./obj/red-pickup/');
   truckmtlloader.load('pickup.mtl', function(materials) {
@@ -180,15 +249,35 @@ function init() {
     truckobjloader.setMaterials(materials);
     truckobjloader.setPath('./obj/red-pickup/');
     truckobjloader.load('pickup.obj', function(object) {
-      object.position.set(0, 0, 20);
+      object.castShadow = true;
       object.scale.set(10, 10, 10);
       scene.add(object);
-      object.position.set(-10, 0, 20);
+      object.position.set(0, 0, 30);
+      object.rotation.set(0, Math.PI / 2, 0);
       scene.add(object);
-      objects.push(object);
     }, onProgress, onError);
   });
+  // news
+  texture = new THREE.Texture(canvas);
+  var material = new THREE.MeshBasicMaterial({
+    map: texture
+  });
+  geometry = new THREE.PlaneGeometry(12, 12);
+  mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(20, 8, 0);
+  mesh.rotation.y = 3 * Math.PI / 2;
+  scene.add(mesh);
+  canvas.width = canvas.height = size;
 
+
+  // LIGHTING
+  rectLight = new THREE.RectAreaLight(0xffffff, 1000, 24, 13.5);
+  rectLight.position.set(0, 6, -25);
+  rectLightHelper = new THREE.RectAreaLightHelper(rectLight);
+  scene.add(rectLightHelper);
+  scene.add(rectLight);
+  var ambient = new THREE.AmbientLight(0x101010);
+  scene.add(ambient);
 
   // particle
   particleMaterial = new THREE.SpriteCanvasMaterial({
@@ -205,7 +294,6 @@ function init() {
 
   // CONTROLS
   // LOOK AROUND
-  control = new THREE.OrbitControls(camera, element);
   control.target.set(
     camera.position.x + 0.15, camera.position.y, camera.position
     .z);
@@ -225,6 +313,7 @@ function init() {
 
   // WINDOW
   window.addEventListener('resize', onWindowResize, false);
+
   animate();
 }
 
@@ -263,13 +352,15 @@ function onWindowResize() {
 }
 
 function animate() {
-
   requestAnimationFrame(animate);
-
-  // mesh.rotation.x += 0.001;
-  // mesh.rotation.y += 0.008;
-
+  changeCanvas();
+  texture.needsUpdate = true;
   renderer.render(scene, camera);
+}
+
+function render() {
+  recLightHelper.update();
+  rnd.render(scn, cam);
 }
 
 // https://github.com/sitepoint-editors/VRWeatherParticles/blob/master/index.html
@@ -297,15 +388,30 @@ function onDocumentMouseDown(event) {
   mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
   mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
   raycaster.setFromCamera(mouse, camera);
-  var intersects = raycaster.intersectObjects(objects);
+  var intersects = raycaster.intersectObjects(scene.children, true);
   if (intersects.length > 0) {
-    if (intersects[0].object == imgmesh) {
-      intersects[0].object.material.color.setHex(Math.random() * 0xffffff);
+    if (arrOfWebpImages.length != 0 && intersects[0].object == imgmesh) {
+      imageiterator = (imageiterator + 1) % arrOfWebpImages.length;
+      var src = arrOfWebpImages[imageiterator]["webp_images"][0]["source"];
+      var imgtex = texloader.load(src);
+      var imgmat = new THREE.MeshBasicMaterial({
+        map: imgtex
+      });
+      intersects[0].object.material = imgmat;
     }
-    // var particle = new THREE.Sprite(particleMaterial);
-    // particle.position.copy(intersects[0].point);
-    // particle.scale.x = particle.scale.y = 16;
-    // scene.add(particle);
+    if (musicTopTracksPreviewList.length != 0 && intersects[0].object.parent.uuid ==
+      radioid) {
+      sounditer = (sounditer + 1) % musicTopTracksPreviewList.length;
+      var track = musicTopTracksPreviewList[sounditer];
+      sound.stop();
+      audioLoader.load(
+        track,
+        function(buffer) {
+          sound.setBuffer(buffer);
+          sound.setRefDistance(20);
+          sound.play();
+        });
+    }
   }
 }
 
