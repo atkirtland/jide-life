@@ -75,7 +75,6 @@ var musicTopTracksPreviewList = [];
                     success: function(response) {
                         $("#fbBtn").show();
                         $("#spotify-login-button").hide();
-                        $("#fbBtn").hide();
                         console.log(response);
                         response.items.forEach(function(element) {
                             musicTopTracksPreviewList.push(element.preview_url);
