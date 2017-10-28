@@ -50,6 +50,9 @@ var musicTopTracksPreviewList = [];
                       'Authorization': 'Bearer ' + access_token
                     },
                     success: function(response) {
+                        $("#start3DViewBtn").show();
+                        $("#spotify-login-button").hide();
+                        $("#fbBtn").hide();
                         console.log(response);
                         response.items.forEach(function(element) {
                             musicTopTracksPreviewList.push(element.preview_url);

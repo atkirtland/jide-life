@@ -21,7 +21,7 @@ var userPersonalInfo;
 function checkLoginState(){
     FB.getLoginStatus(function(response) {
         if (response.status === 'connected') {
-            // document.getElementsByTagName("fb:login-button").
+          $("#fbBtn").hide();
           FB.api(
             '/me/photos',
             'GET',
@@ -50,6 +50,8 @@ function checkLoginState(){
                 userPersonalInfo = response;
             }
           );
+
+          $("#spotify-login-button").show();
           console.log(response);
           console.log(arrOfWebpImages);
         }
