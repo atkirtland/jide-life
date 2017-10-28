@@ -25,7 +25,12 @@ function init() {
   document.body.appendChild(element);
 
   // TEXTURES:
-  var texloader = new THREE.TextureLoader();
+  var manager = new THREE.LoadingManager();
+  manager.onProgress = function(item, loaded, total) {
+    console.log(item, loaded, total);
+  };
+
+  var texloader = new THREE.TextureLoader(manager);
   // img
   var imgtex = texloader.load('../textures/dog.jpg');
   var width = 192,
@@ -50,15 +55,6 @@ function init() {
   scene.add(imgmesh);
   objects.push(imgmesh);
 
-
-  // var width = 192,
-  //   height = 108,
-  //   width_segments = 1,
-  //   height_segments = 100;
-  // imgmmesh = new THREE.Mesh(imggeo, new THREE.MeshBasicMaterial({
-  //   color: 0x888888
-  // }));
-  // scene.add(imgmesh);
 
   // floor flr
   var flrtex = texloader.load('../textures/grass.jpg');
@@ -119,6 +115,32 @@ function init() {
   splmesh.position.set(0, 5, 0);
   scene.add(splmesh);
 
+  // LIGHTING
+
+  var ambient = new THREE.AmbientLight(0x444444);
+  scene.add(ambient);
+
+  var directionalLight = new THREE.DirectionalLight(0xffeedd);
+  directionalLight.position.set(0, 0, 1).normalize();
+  scene.add(directionalLight);
+
+  // OBJECTS
+  THREE.Loader.Handlers.add(/\.dds$/i, new THREE.DDSLoader());
+  var mtlLoader = new THREE.MTLLoader();
+  mtlLoader.setPath('./obj/male02/');
+  mtlLoader.load('male02_dds.mtl', function(materials) {
+    materials.preload();
+    var objLoader = new THREE.OBJLoader();
+    objLoader.setMaterials(materials);
+    objLoader.setPath('./obj/male02/');
+    objLoader.load('male02.obj', function(object) {
+      object.position.set(100, 10, 10);
+      object.scale.set(0.2, 0.2, 0.2);
+      objects.push(object);
+      scene.add(object);
+    }, onProgress, onError);
+  });
+
   // particle
   particleMaterial = new THREE.SpriteCanvasMaterial({
     color: 0x000000,
@@ -129,30 +151,58 @@ function init() {
     }
   });
 
-
   // EFFECT
   effect = new THREE.StereoEffect(renderer);
+
+  // AUDIO
+  var listener = new THREE.AudioListener();
+  camera.add(listener);
+  var sound = new THREE.PositionalAudio(listener);
+  var audioLoader = new THREE.AudioLoader();
+  audioLoader.load(
+    '../audio/dragon.mp3',
+    function(buffer) {
+      sound.setBuffer(buffer);
+      sound.setRefDistance(20);
+      // TODO temp
+      // sound.play();
+    });
+  // occurs after adding to scene in example
+  imgmesh.add(sound);
 
   // CONTROLS
   // LOOK AROUND
   control = new THREE.OrbitControls(camera, element);
-  control.target.set(camera.position.x + 0.15, camera.position.y, camera.position
+  control.target.set(
+    camera.position.x + 0.15, camera.position.y, camera.position
     .z);
   control.enablePan = false;
   control.enableZoom = false;
 
-  window.addEventListener('deviceorientation', setOrientationControls, true);
+  window.addEventListener('deviceorientation', setOrientationControls,
+    true);
 
   // TOUCH EVENTS
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2();
-  document.addEventListener('mousedown', onDocumentMouseDown, false);
-  document.addEventListener('touchestart', onDocumentTouchStart, false);
+  document.addEventListener(
+    'mousedown', onDocumentMouseDown, false);
+  document.addEventListener(
+    'touchestart', onDocumentTouchStart, false);
 
   // WINDOW
   window.addEventListener('resize', onWindowResize, false);
   animate();
 }
+
+var onProgress = function(xhr) {
+  if (xhr.lengthComputable) {
+    var percentComplete = xhr.loaded / xhr.total * 100;
+    console.log(Math.round(percentComplete, 2) + '% downloaded');
+  }
+};
+
+var onError = function(xhr) {};
 
 function setOrientationControls(e) {
   // if the data is invalid
@@ -166,7 +216,8 @@ function setOrientationControls(e) {
 
   element.addEventListener('click', fullscreen, false);
 
-  window.removeEventListener('deviceorientation', setOrientationControls,
+  window.removeEventListener('deviceorientation',
+    setOrientationControls,
     true);
 }
 
@@ -222,3 +273,13 @@ function onDocumentMouseDown(event) {
     // scene.add(particle);
   }
 }
+
+// https://github.com/mrdoob/three.js/blob/dev/examples/webgl_loader_obj.html
+var onProgress = function(xhr) {
+  if (xhr.lengthComputable) {
+    var percentComplete = xhr.loaded / xhr.total * 100;
+    console.log(Math.round(percentComplete, 2) + '% downloaded');
+  }
+};
+
+var onError = function(xhr) {};
