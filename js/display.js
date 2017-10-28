@@ -5,6 +5,7 @@ var effect, controls;
 var imggeo, imgmesh;
 // used for touch events
 var objects = [];
+var imageiterator = 0;
 
 function init() {
 
@@ -32,7 +33,11 @@ function init() {
 
   var texloader = new THREE.TextureLoader(manager);
   // img
-  var imgtex = texloader.load('../textures/dog.jpg');
+  var src = (arrOfWebpImages.length != 0) ? arrOfWebpImages[imageiterator][
+      "webp_images"
+    ][0]
+    ["source"] : "../textures/dog.jpg";
+  var imgtex = texloader.load(src);
   var width = 192,
     height = 108,
     width_segments = 1,
@@ -294,7 +299,9 @@ function onDocumentMouseDown(event) {
   raycaster.setFromCamera(mouse, camera);
   var intersects = raycaster.intersectObjects(objects);
   if (intersects.length > 0) {
-    intersects[0].object.material.color.setHex(Math.random() * 0xffffff);
+    if (intersects[0].object == imgmesh) {
+      intersects[0].object.material.color.setHex(Math.random() * 0xffffff);
+    }
     // var particle = new THREE.Sprite(particleMaterial);
     // particle.position.copy(intersects[0].point);
     // particle.scale.x = particle.scale.y = 16;
