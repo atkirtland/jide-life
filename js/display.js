@@ -22,10 +22,6 @@ var recLight, recLightHelper;
 var manager = new THREE.LoadingManager();
 var texloader = new THREE.TextureLoader(manager);
 var fontloader = new THREE.FontLoader(manager);
-fontloader.load('fonts/helvetiker_regular.typeface.json', function(font) {
-  init(font);
-  animate();
-});
 
 var canvas = document.createElement('canvas'),
   ctx = canvas.getContext('2d'),
@@ -390,6 +386,7 @@ function onDocumentMouseDown(event) {
   raycaster.setFromCamera(mouse, camera);
   var intersects = raycaster.intersectObjects(scene.children, true);
   if (intersects.length > 0) {
+    console.log("hi");
     if (arrOfWebpImages.length != 0 && intersects[0].object == imgmesh) {
       imageiterator = (imageiterator + 1) % arrOfWebpImages.length;
       var src = arrOfWebpImages[imageiterator]["webp_images"][0]["source"];
