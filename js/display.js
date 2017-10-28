@@ -3,9 +3,13 @@ var imgmesh, splmesh, sprmesh;
 var element;
 var effect, controls;
 var imggeo, imgmesh;
-// used for touch events
-var objects = [];
 var imageiterator = 0;
+var sounditer = 0;
+var radioid;
+var audiolistener, sound, audioLoader;
+
+var manager = new THREE.LoadingManager();
+var texloader = new THREE.TextureLoader(manager);
 
 function init() {
 
@@ -26,12 +30,10 @@ function init() {
   document.body.appendChild(element);
 
   // TEXTURES:
-  var manager = new THREE.LoadingManager();
   manager.onProgress = function(item, loaded, total) {
     console.log(item, loaded, total);
   };
 
-  var texloader = new THREE.TextureLoader(manager);
   // img
   var src = (arrOfWebpImages.length != 0) ? arrOfWebpImages[imageiterator][
       "webp_images"
@@ -58,7 +60,6 @@ function init() {
   // 50 seems to push it up to the bottom edge
   imgmesh.position.set(0, 50, -75);
   scene.add(imgmesh);
-  objects.push(imgmesh);
 
 
   // floor flr
@@ -121,16 +122,18 @@ function init() {
   scene.add(splmesh);
 
   // AUDIO
-  var listener = new THREE.AudioListener();
-  camera.add(listener);
-  var sound = new THREE.PositionalAudio(listener);
-  var audioLoader = new THREE.AudioLoader();
+  audiolistener = new THREE.AudioListener();
+  camera.add(audiolistener);
+  sound = new THREE.PositionalAudio(audiolistener);
+  audioLoader = new THREE.AudioLoader();
+  var track = musicTopTracksPreviewList[sounditer];
+  console.log(track);
   audioLoader.load(
-    '../audio/dragon.mp3',
+    track,
     function(buffer) {
       sound.setBuffer(buffer);
       sound.setRefDistance(20);
-      // sound.play();
+      sound.play();
     });
 
   // LIGHTING
@@ -157,7 +160,6 @@ function init() {
       object.scale.set(0.05, 0.05, 0.05);
       object.rotation.y = -Math.PI / 2;
       scene.add(object);
-      objects.push(object);
     }, onProgress, onError);
   });
   // radio
@@ -169,7 +171,7 @@ function init() {
     object.scale.set(0.65, 0.65, 0.65);
     object.add(sound);
     scene.add(object);
-    objects.push(object);
+    radioid = object.uuid;
   }, onProgress, onError);
   // man
   var truckmtlloader = new THREE.MTLLoader();
@@ -185,7 +187,6 @@ function init() {
       scene.add(object);
       object.position.set(-10, 0, 20);
       scene.add(object);
-      objects.push(object);
     }, onProgress, onError);
   });
 
@@ -297,15 +298,31 @@ function onDocumentMouseDown(event) {
   mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
   mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
   raycaster.setFromCamera(mouse, camera);
-  var intersects = raycaster.intersectObjects(objects);
+  var intersects = raycaster.intersectObjects(scene.children, true);
   if (intersects.length > 0) {
-    if (intersects[0].object == imgmesh) {
-      intersects[0].object.material.color.setHex(Math.random() * 0xffffff);
+    if (arrOfWebpImages.length != 0 && intersects[0].object == imgmesh) {
+      imageiterator = (imageiterator + 1) % arrOfWebpImages.length;
+      var src = arrOfWebpImages[imageiterator]["webp_images"][0]["source"];
+      var imgtex = texloader.load(src);
+      var imgmat = new THREE.MeshBasicMaterial({
+        map: imgtex
+      });
+      intersects[0].object.material = imgmat;
     }
-    // var particle = new THREE.Sprite(particleMaterial);
-    // particle.position.copy(intersects[0].point);
-    // particle.scale.x = particle.scale.y = 16;
-    // scene.add(particle);
+    if (musicTopTracksPreviewList.length != 0 && intersects[0].object.parent.uuid ==
+      radioid) {
+      sounditer = (sounditer + 1) % musicTopTracksPreviewList.length;
+      var track = musicTopTracksPreviewList[sounditer];
+      console.log(track);
+      sound.stop();
+      audioLoader.load(
+        track,
+        function(buffer) {
+          sound.setBuffer(buffer);
+          sound.setRefDistance(20);
+          sound.play();
+        });
+    }
   }
 }
 
