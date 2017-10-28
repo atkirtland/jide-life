@@ -8,11 +8,16 @@
 
   </head>
   <body onload="init()">
+      <button id='spotify-login-button' >spotify login button</button>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="./js/SpotifyAPI.js"></script>
+    
     <script src="./js/FacebookAPI.js"></script>
     <fb:login-button 
     scope="public_profile,email,user_photos,user_about_me,user_hometown,user_birthday"
     onlogin="checkLoginState();">
   </fb:login-button>
+    
      <script src="./lib/three.js"></script>
     <script src="./lib/OrbitControls.js"></script>
     <script src="./lib/VREffect.js"></script>
