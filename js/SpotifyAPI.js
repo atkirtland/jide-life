@@ -50,6 +50,7 @@ var musicTopTracksPreviewList = [];
                       'Authorization': 'Bearer ' + access_token
                     },
                     success: function(response) {
+                        console.log(response);
                         response.items.forEach(function(element) {
                             musicTopTracksPreviewList.push(element.preview_url);
                         }, this);
@@ -65,7 +66,7 @@ var musicTopTracksPreviewList = [];
                 var state = generateRandomString(16);
     
                 localStorage.setItem(stateKey, state);
-                var scope = 'user-read-private user-read-email';
+                var scope = 'user-read-private user-read-email user-top-read';
     
                 var url = 'https://accounts.spotify.com/authorize';
                 url += '?response_type=token';
