@@ -8,8 +8,12 @@
 
   </head>
   <body onload="init()">
-
-    <script src="./lib/three.js"></script>
+    <script src="./js/FacebookAPI.js"></script>
+    <fb:login-button 
+    scope="public_profile,email,user_photos,user_about_me,user_hometown,user_birthday"
+    onlogin="checkLoginState();">
+  </fb:login-button>
+     <script src="./lib/three.js"></script>
     <script src="./lib/OrbitControls.js"></script>
     <script src="./lib/VREffect.js"></script>
     <script src="./lib/StereoEffect.js"></script>
@@ -18,7 +22,7 @@
     <script src="./lib/DDSLoader.js"></script>
     <script src="./lib/MTLLoader.js"></script>
     <script src="./lib/OBJLoader.js"></script>
-
-    <script src="./js/display.js"></script>
+    <script src="./js/display.js"></script> 
+    
   </body>
 </html>
