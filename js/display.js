@@ -15,7 +15,7 @@ var renderer = new THREE.WebGLRenderer({
 });
 var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight,
   1, 10000);
-var control = new THREE.OrbitControls(camera, element);
+var control; // = new THREE.OrbitControls(camera, element);
 var scene = new THREE.Scene();
 var origin = new THREE.Object3D();
 
@@ -295,15 +295,15 @@ function init(font) {
 
   // CONTROLS
   // LOOK AROUND
-  control.target.set(
-    camera.position.x + 0.15, camera.position.y, camera.position
-    .z);
-  control.enablePan = false;
-  control.enableZoom = false;
+  // control.target.set(
+  //   camera.position.x + 0.15, camera.position.y, camera.position
+  //   .z);
+  // control.enablePan = false;
+  // control.enableZoom = false;
   // fps
 
-  window.addEventListener('deviceorientation', setOrientationControls,
-    true);
+  // window.addEventListener('deviceorientation', setOrientationControls,
+  //   true);
 
   // TOUCH EVENTS
   raycaster = new THREE.Raycaster();
@@ -328,22 +328,22 @@ var onProgress = function(xhr) {
 
 var onError = function(xhr) {};
 
-function setOrientationControls(e) {
-  // if the data is invalid
-  if (!e.alpha) {
-    return;
-  }
-
-  control = new THREE.DeviceOrientationControls(camera, true);
-  control.connect();
-  control.update();
-
-  element.addEventListener('click', fullscreen, false);
-
-  window.removeEventListener('deviceorientation',
-    setOrientationControls,
-    true);
-}
+// function setOrientationControls(e) {
+//   // if the data is invalid
+//   if (!e.alpha) {
+//     return;
+//   }
+//
+//   control = new THREE.DeviceOrientationControls(camera, true);
+//   control.connect();
+//   control.update();
+//
+//   element.addEventListener('click', fullscreen, false);
+//
+//   window.removeEventListener('deviceorientation',
+//     setOrientationControls,
+//     true);
+// }
 
 function onWindowResize() {
 
