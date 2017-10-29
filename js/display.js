@@ -79,10 +79,11 @@ function init(font) {
   };
 
   // img
-  var src = (arrOfWebpImages.length != 0) ? arrOfWebpImages[imageiterator][
-      "webp_images"
-    ][0]
-    ["source"] : "../textures/dog.jpg";
+  // var src = (arrOfWebpImages.length != 0) ? arrOfWebpImages[imageiterator][
+  //     "webp_images"
+  //   ][0]
+  //   ["source"] : "../textures/dog.jpg";
+  var src = "../textures/dog.jpg";
   var imgtex = texloader.load(src);
   var width = 24,
     height = 13.5,
@@ -182,7 +183,8 @@ function init(font) {
   camera.add(audiolistener);
   sound = new THREE.PositionalAudio(audiolistener);
   audioLoader = new THREE.AudioLoader();
-  var track = musicTopTracksPreviewList[sounditer];
+  var track = "../audio/dragon.mp3";
+  // var track = musicTopTracksPreviewList[sounditer];
   audioLoader.load(
     track,
     function(buffer) {
@@ -391,28 +393,28 @@ function onDocumentMouseDown(event) {
   var intersects = raycaster.intersectObjects(scene.children, true);
   if (intersects.length > 0) {
     console.log("hi");
-    if (arrOfWebpImages.length != 0 && intersects[0].object == imgmesh) {
-      imageiterator = (imageiterator + 1) % arrOfWebpImages.length;
-      var src = arrOfWebpImages[imageiterator]["webp_images"][0]["source"];
-      var imgtex = texloader.load(src);
-      var imgmat = new THREE.MeshBasicMaterial({
-        map: imgtex
-      });
-      intersects[0].object.material = imgmat;
-    }
-    if (musicTopTracksPreviewList.length != 0 && intersects[0].object.parent.uuid ==
-      radioid) {
-      sounditer = (sounditer + 1) % musicTopTracksPreviewList.length;
-      var track = musicTopTracksPreviewList[sounditer];
-      sound.stop();
-      audioLoader.load(
-        track,
-        function(buffer) {
-          sound.setBuffer(buffer);
-          sound.setRefDistance(20);
-          sound.play();
-        });
-    }
+    // if (arrOfWebpImages.length != 0 && intersects[0].object == imgmesh) {
+    //   imageiterator = (imageiterator + 1) % arrOfWebpImages.length;
+    //   var src = arrOfWebpImages[imageiterator]["webp_images"][0]["source"];
+    //   var imgtex = texloader.load(src);
+    //   var imgmat = new THREE.MeshBasicMaterial({
+    //     map: imgtex
+    //   });
+    //   intersects[0].object.material = imgmat;
+    // }
+    // if (musicTopTracksPreviewList.length != 0 && intersects[0].object.parent.uuid ==
+    //   radioid) {
+    //   sounditer = (sounditer + 1) % musicTopTracksPreviewList.length;
+    //   var track = musicTopTracksPreviewList[sounditer];
+    //   sound.stop();
+    //   audioLoader.load(
+    //     track,
+    //     function(buffer) {
+    //       sound.setBuffer(buffer);
+    //       sound.setRefDistance(20);
+    //       sound.play();
+    //     });
+    // }
   }
 }
 
