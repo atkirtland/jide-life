@@ -54,9 +54,13 @@ function checkLoginState(){
                 console.log('userPersonalInfo')
                 console.log(userPersonalInfo);
 
-                if (userPersonalInfo.age_range != null) {
-                    var averageAge = userPersonalInfo.age_range.max + userPersonalInfo.age_range.min;
-                    averageAge = averageAge / 2;
+                
+                    var averageAge = 40;
+                    if (userPersonalInfo.age_range != null) {
+                        if (userPersonalInfo.age_range.min == null) averageAge = userPersonalInfo.age_range.max;
+                        if (userPersonalInfo.age_range.max == null) averageAge = userPersonalInfo.age_range.min;
+                        averageAge = (userPersonalInfo.age_range.max + userPersonalInfo.age_range.min) / 2;
+                    }
                     // Built by LucyBot. www.lucybot.com
                     var year = (new Date()).getFullYear() - Math.round(averageAge / 3);
                     var url = "https://api.nytimes.com/svc/archive/v1/"+year+"/1.json";
@@ -92,8 +96,6 @@ function checkLoginState(){
                     }).done(success).fail(function(err) {
                         throw err;
                     });
-                }
-                
             }
           );
 
