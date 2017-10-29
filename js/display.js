@@ -83,8 +83,7 @@ function init(font) {
   //     "webp_images"
   //   ][0]
   //   ["source"] : "../textures/dog.jpg";
-  var src = window.location.href + "/textures/dog.jpg";
-  console.log(src);
+  var src = "/textures/dog.jpg";
   var imgtex = texloader.load(src);
   var width = 24,
     height = 13.5,
