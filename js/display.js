@@ -7,6 +7,8 @@ WEBVR.checkAvailability().catch(function(message) {
   document.body.appendChild(WEBVR.getMessageContainer(message))
 })
 
+THREE.VRController.verbosity = 1;
+
 
 var camera;
 var imgmesh, splmesh, sprmesh;
@@ -41,7 +43,28 @@ var canvas = document.createElement('canvas'),
   ctx = canvas.getContext('2d'),
   size = 256;
 
-function changeCanvas() {
+
+function wrapText(context, text, x, y, maxWidth, lineHeight) {
+  var words = text.split(' ');
+  var line = '';
+
+  for(var n = 0; n < words.length; n++) {
+    var testLine = line + words[n] + ' ';
+    var metrics = context.measureText(testLine);
+    var testWidth = metrics.width;
+    if (testWidth > maxWidth && n > 0) {
+      context.fillText(line, x, y);
+      line = words[n] + ' ';
+      y += lineHeight;
+    }
+    else {
+      line = testLine;
+    }
+  }
+  context.fillText(line, x, y);
+}
+
+function changeCanvas(x, y, maxWidth, lineHeight) {
   ctx.font = '20pt Arial';
   ctx.fillStyle = 'red';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -51,6 +74,7 @@ function changeCanvas() {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   var docs = newsList[Math.round(Math.random())].response.docs;
+  // wrapText(ctx, docs[Math.round(Math.random() * docs.length)].abstract, x, y, maxWidth, lineHeight);  
   ctx.fillText(docs[Math.round(Math.random() * docs.length)].abstract, canvas.width / 2, canvas.height / 2);
 }
 
@@ -410,9 +434,13 @@ function onDocumentTouchStart(event) {
 
 function onDocumentMouseDown(event) {
   event.preventDefault();
-  mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
-  mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
-  raycaster.setFromCamera(mouse, camera);
+  // mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
+  // mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
+  // var vector = new THREE.Vector3(0, 0, 1);
+  // vector = camera.localToWorld(vector);
+  // vector.sub(camera.position);
+  // raycaster.setFromCamera(mouse, camera);
+  raycaster.set(camera.getWorldPosition(), camera.getWorldDirection());
   var intersects = raycaster.intersectObjects(scene.children, true);
   if (intersects.length > 0) {
      if (arrOfWebpImages.length != 0 && intersects[0].object == imgmesh) {
@@ -438,7 +466,11 @@ function onDocumentMouseDown(event) {
          });
      }
      if (intersects[0].object == mesh){
-        changeCanvas();
+      var x = 0;
+      var y = 0;
+      var maxWidth = canvas.width;
+      var lineHeight = 25;
+        changeCanvas(x, y, maxWidth, lineHeight);
      }
   }
 }
@@ -452,8 +484,6 @@ var onProgress = function(xhr) {
 };
 
 var onError = function(xhr) {};
-
-
 
 //  Check this out: When THREE.VRController finds a new controller
 //  it will emit a custom “vr controller connected” event on the
@@ -507,15 +537,15 @@ window.addEventListener('vr controller connected', function(event) {
   //  Check out the THREE.VRController.supported{} object to see
   //  all the named buttons we’ve already mapped for you!
   controller.addEventListener('primary press began', function(event) {
-    event.target.userData.mesh.material.color.setHex(meshColorOn)
-    guiInputHelper.pressed(true)
+    event.target.userData.mesh.material.color.setHex(meshColorOn);
+    guiInputHelper.pressed(true);
   })
   controller.addEventListener('primary press ended', function(event) {
-    event.target.userData.mesh.material.color.setHex(meshColorOff)
-    guiInputHelper.pressed(false)
+    event.target.userData.mesh.material.color.setHex(meshColorOff);
+    guiInputHelper.pressed(false);
   })
   //  Daddy, what happens when we die?
   controller.addEventListener('disconnected', function(event) {
-    controller.parent.remove(controller)
+    controller.parent.remove(controller);
   })
 })
