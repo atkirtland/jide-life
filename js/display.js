@@ -38,7 +38,8 @@ function changeCanvas() {
   ctx.fillStyle = 'black';
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(new Date().getTime(), canvas.width / 2, canvas.height / 2);
+  var docs = newsList[Math.round(Math.random())].response.docs;
+  ctx.fillText(docs[Math.round(Math.random() * docs.length)].abstract, canvas.width / 2, canvas.height / 2);
 }
 
 function init(font) {
@@ -364,7 +365,7 @@ function animate() {
 
   effect.render(scene, camera);
 
-  changeCanvas();
+
   texture.needsUpdate = true;
   renderer.render(scene, camera);
 }
@@ -417,6 +418,9 @@ function onDocumentMouseDown(event) {
            sound.setRefDistance(20);
            sound.play();
          });
+     }
+     if (intersects[0].object == mesh){
+        changeCanvas();
      }
   }
 }
