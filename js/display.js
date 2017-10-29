@@ -83,7 +83,7 @@ function init(font) {
   //     "webp_images"
   //   ][0]
   //   ["source"] : "../textures/dog.jpg";
-  var src = "textures/dog.jpg";
+  var src = "/textures/dog.jpg";
   var imgtex = texloader.load(src);
   var width = 24,
     height = 13.5,
@@ -183,7 +183,7 @@ function init(font) {
   camera.add(audiolistener);
   sound = new THREE.PositionalAudio(audiolistener);
   audioLoader = new THREE.AudioLoader();
-  var track = "audio/dragon.mp3";
+  var track = "/audio/dragon.mp3";
   // var track = musicTopTracksPreviewList[sounditer];
   audioLoader.load(
     track,
