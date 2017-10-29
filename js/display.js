@@ -1,3 +1,13 @@
+
+
+//  Does this browser support the WebVR API?
+//  Here’s how to download and configure one that does:
+//  https://webvr.rocks
+WEBVR.checkAvailability().catch(function(message) {
+  document.body.appendChild(WEBVR.getMessageContainer(message))
+})
+
+
 var camera;
 var imgmesh, splmesh, sprmesh;
 var element;
@@ -13,6 +23,8 @@ var pointLight;
 var renderer = new THREE.WebGLRenderer({
   antialias: true
 });
+renderer.vr.enabled = true;
+renderer.vr.standing = true;
 var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight,
   1, 10000);
 var control; // = new THREE.OrbitControls(camera, element);
@@ -346,6 +358,14 @@ var onError = function(xhr) {};
 //     true);
 // }
 
+
+//  This button is important. It toggles between normal in-browser view
+//  and the brand new WebVR in-your-goggles view!
+WEBVR.getVRDisplay(function(display) {
+  renderer.vr.setDevice(display)
+  document.body.appendChild(WEBVR.getButton(display, renderer.domElement))
+})
+
 function onWindowResize() {
 
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -395,7 +415,6 @@ function onDocumentMouseDown(event) {
   raycaster.setFromCamera(mouse, camera);
   var intersects = raycaster.intersectObjects(scene.children, true);
   if (intersects.length > 0) {
-<<<<<<< HEAD
      if (arrOfWebpImages.length != 0 && intersects[0].object == imgmesh) {
        imageiterator = (imageiterator + 1) % arrOfWebpImages.length;
        var src = arrOfWebpImages[imageiterator]["images"][0]["source"];
@@ -421,30 +440,6 @@ function onDocumentMouseDown(event) {
      if (intersects[0].object == mesh){
         changeCanvas();
      }
-=======
-    if (arrOfWebpImages.length != 0 && intersects[0].object == imgmesh) {
-      imageiterator = (imageiterator + 1) % arrOfWebpImages.length;
-      var src = arrOfWebpImages[imageiterator]["images"][0]["source"];
-      var imgtex = texloader.load(src);
-      var imgmat = new THREE.MeshBasicMaterial({
-        map: imgtex
-      });
-      intersects[0].object.material = imgmat;
-    }
-    if (musicTopTracksPreviewList.length != 0 && intersects[0].object.parent.uuid ==
-      radioid) {
-      sounditer = (sounditer + 1) % musicTopTracksPreviewList.length;
-      var track = musicTopTracksPreviewList[sounditer];
-      sound.stop();
-      audioLoader.load(
-        track,
-        function(buffer) {
-          sound.setBuffer(buffer);
-          sound.setRefDistance(20);
-          sound.play();
-        });
-    }
->>>>>>> origin/master
   }
 }
 
@@ -458,19 +453,7 @@ var onProgress = function(xhr) {
 
 var onError = function(xhr) {};
 
-//  Does this browser support the WebVR API?
-//  Here’s how to download and configure one that does:
-//  https://webvr.rocks
-WEBVR.checkAvailability().catch(function(message) {
-  document.body.appendChild(WEBVR.getMessageContainer(message))
-})
 
-//  This button is important. It toggles between normal in-browser view
-//  and the brand new WebVR in-your-goggles view!
-WEBVR.getVRDisplay(function(display) {
-  renderer.vr.setDevice(display)
-  document.body.appendChild(WEBVR.getButton(display, renderer.domElement))
-})
 
 //  Check this out: When THREE.VRController finds a new controller
 //  it will emit a custom “vr controller connected” event on the
