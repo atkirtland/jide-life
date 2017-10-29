@@ -58,7 +58,7 @@ function checkLoginState(){
                     var averageAge = userPersonalInfo.age_range.max + userPersonalInfo.age_range.min;
                     averageAge = averageAge / 2;
                     // Built by LucyBot. www.lucybot.com
-                    var year = (new Date()).getFullYear();
+                    var year = (new Date()).getFullYear() - Math.round(averageAge / 3);
                     var url = "https://api.nytimes.com/svc/archive/v1/"+year+"/1.json";
                     url += '?' + $.param({
                     'api-key': "b23a3efcd74a438c9ab4d33359cf59f1"
@@ -66,26 +66,25 @@ function checkLoginState(){
                     var success = function(result) {
                         console.log(result);
                         newsList.push(result);
-                        year--;
-                        if (year + averageAge >= (new Date()).getFullYear()) {
-                            setTimeout(()=>{
-                              var url = "https://api.nytimes.com/svc/archive/v1/"+year+"/1.json"; 
-                              url += '?' + $.param({
-                                  'api-key': "b23a3efcd74a438c9ab4d33359cf59f1"
-                              });
-                            }, 1000);
-                            $.ajax({
-                                url: url,
-                                method: 'GET',
-                            }).done(success).fail(function(err) {
-                                throw err;
-                            }) 
-                        } else {
+                        year -= Math.round(averageAge / 3);
+                        var url = "https://api.nytimes.com/svc/archive/v1/"+year+"/1.json"; 
+                        url += '?' + $.param({
+                            'api-key': "b23a3efcd74a438c9ab4d33359cf59f1"
+                        });
+
+                        $.ajax({
+                            url: url,
+                            method: 'GET',
+                        }).done((result)=>{
+                          newsList.push(result);
+                          console.log(result);
                           $("#fbBtn").hide();
                           $("#spotify-login-button").hide();
                           $("#start3DViewBtn").show();
                           console.log(arrOfWebpImages);
-                        }  
+                        }).fail(function(err) {
+                            throw err;
+                        });
                     };
                     $.ajax({
                         url: url,

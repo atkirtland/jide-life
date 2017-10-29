@@ -71,7 +71,7 @@ var musicTopTracksPreviewList = [];
                     url: 'https://api.spotify.com/v1/me/top/tracks',
                     headers: {
                       'Authorization': 'Bearer ' + access_token
-                    },
+                  },
                     success: function(response) {
                         $("#fbBtn").show();
                         $("#spotify-login-button").hide();
