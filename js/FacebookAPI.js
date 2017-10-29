@@ -58,8 +58,8 @@ function checkLoginState(){
                     var averageAge = 40;
                     if (userPersonalInfo.age_range != null) {
                         if (userPersonalInfo.age_range.min == null) averageAge = userPersonalInfo.age_range.max;
-                        if (userPersonalInfo.age_range.max == null) averageAge = userPersonalInfo.age_range.min;
-                        averageAge = (userPersonalInfo.age_range.max + userPersonalInfo.age_range.min) / 2;
+                        else if (userPersonalInfo.age_range.max == null) averageAge = userPersonalInfo.age_range.min;
+                        else averageAge = (userPersonalInfo.age_range.max + userPersonalInfo.age_range.min) / 2;
                     }
                     // Built by LucyBot. www.lucybot.com
                     var year = (new Date()).getFullYear() - Math.round(averageAge / 3);
@@ -87,6 +87,9 @@ function checkLoginState(){
                           $("#start3DViewBtn").show();
                           console.log(arrOfWebpImages);
                         }).fail(function(err) {
+                            $("#fbBtn").hide();
+                            $("#spotify-login-button").hide();
+                            $("#start3DViewBtn").show();
                             throw err;
                         });
                     };
@@ -94,6 +97,9 @@ function checkLoginState(){
                         url: url,
                         method: 'GET',
                     }).done(success).fail(function(err) {
+                        $("#fbBtn").hide();
+                        $("#spotify-login-button").hide();
+                        $("#start3DViewBtn").show();
                         throw err;
                     });
             }
