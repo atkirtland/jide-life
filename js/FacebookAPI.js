@@ -28,7 +28,7 @@ function checkLoginState(){
           FB.api(
             '/me/photos',
             'GET',
-            {"fields":"webp_images,updated_time", "type":"uploaded"},
+            {"fields":"images,updated_time", "type":"uploaded"},
             function(response) {
                 response.data.forEach(function(element) {
                     arrOfWebpImages.push(element);
@@ -38,7 +38,7 @@ function checkLoginState(){
           FB.api(
             '/me/photos',
             'GET',
-            {"fields":"webp_images,updated_time", "type":"tagged"},
+            {"fields":"images,updated_time", "type":"tagged"},
             function(response) {
                 response.data.forEach(function(element) {
                     arrOfWebpImages.push(element);

@@ -79,11 +79,11 @@ function init(font) {
   };
 
   // img
-  // var src = (arrOfWebpImages.length != 0) ? arrOfWebpImages[imageiterator][
-  //     "webp_images"
-  //   ][0]
-  //   ["source"] : "../textures/dog.jpg";
-  var src = "/textures/dog.jpg";
+  var src = (arrOfWebpImages.length != 0) ? arrOfWebpImages[imageiterator][
+   "images"
+   ][0]
+   ["source"] : "../textures/dog.jpg";
+  //var src = "/textures/dog.jpg";
   var imgtex = texloader.load(src);
   var width = 24,
     height = 13.5,
@@ -91,7 +91,7 @@ function init(font) {
     height_segments = 100;
   imggeo = new THREE.PlaneGeometry(width, height, width_segments,
     height_segments);
-  var imgmat = new THREE.MeshStandardMaterial({
+  var imgmat = new THREE.MeshBasicMaterial({
     map: imgtex,
     polygonOffset: true
   });
@@ -183,8 +183,8 @@ function init(font) {
   camera.add(audiolistener);
   sound = new THREE.PositionalAudio(audiolistener);
   audioLoader = new THREE.AudioLoader();
-  var track = "/audio/dragon.mp3";
-  // var track = musicTopTracksPreviewList[sounditer];
+  //var track = "/audio/dragon.mp3";
+  var track = musicTopTracksPreviewList[sounditer];
   audioLoader.load(
     track,
     function(buffer) {
@@ -293,15 +293,17 @@ function init(font) {
   });
 
   // EFFECT
-  effect = new THREE.StereoEffect(renderer);
+  effect = new THREE.VREffect(renderer);
 
   // CONTROLS
   // LOOK AROUND
+  // orbital
   control.target.set(
     camera.position.x + 0.15, camera.position.y, camera.position
     .z);
   control.enablePan = false;
   control.enableZoom = false;
+  // fps
 
   window.addEventListener('deviceorientation', setOrientationControls,
     true);
@@ -360,6 +362,8 @@ function animate() {
   pointLight.position.y = Math.cos(time * 3) * 0.5 + 5;
   truckpl.position.x = Math.cos(time * 3) * 2;
 
+  effect.render(scene, camera);
+
   changeCanvas();
   texture.needsUpdate = true;
   renderer.render(scene, camera);
@@ -392,29 +396,28 @@ function onDocumentMouseDown(event) {
   raycaster.setFromCamera(mouse, camera);
   var intersects = raycaster.intersectObjects(scene.children, true);
   if (intersects.length > 0) {
-    console.log("hi");
-    // if (arrOfWebpImages.length != 0 && intersects[0].object == imgmesh) {
-    //   imageiterator = (imageiterator + 1) % arrOfWebpImages.length;
-    //   var src = arrOfWebpImages[imageiterator]["webp_images"][0]["source"];
-    //   var imgtex = texloader.load(src);
-    //   var imgmat = new THREE.MeshBasicMaterial({
-    //     map: imgtex
-    //   });
-    //   intersects[0].object.material = imgmat;
-    // }
-    // if (musicTopTracksPreviewList.length != 0 && intersects[0].object.parent.uuid ==
-    //   radioid) {
-    //   sounditer = (sounditer + 1) % musicTopTracksPreviewList.length;
-    //   var track = musicTopTracksPreviewList[sounditer];
-    //   sound.stop();
-    //   audioLoader.load(
-    //     track,
-    //     function(buffer) {
-    //       sound.setBuffer(buffer);
-    //       sound.setRefDistance(20);
-    //       sound.play();
-    //     });
-    // }
+     if (arrOfWebpImages.length != 0 && intersects[0].object == imgmesh) {
+       imageiterator = (imageiterator + 1) % arrOfWebpImages.length;
+       var src = arrOfWebpImages[imageiterator]["images"][0]["source"];
+       var imgtex = texloader.load(src);
+       var imgmat = new THREE.MeshBasicMaterial({
+         map: imgtex
+       });
+       intersects[0].object.material = imgmat;
+     }
+     if (musicTopTracksPreviewList.length != 0 && intersects[0].object.parent.uuid ==
+       radioid) {
+       sounditer = (sounditer + 1) % musicTopTracksPreviewList.length;
+       var track = musicTopTracksPreviewList[sounditer];
+       sound.stop();
+       audioLoader.load(
+         track,
+         function(buffer) {
+           sound.setBuffer(buffer);
+           sound.setRefDistance(20);
+           sound.play();
+         });
+     }
   }
 }
 
