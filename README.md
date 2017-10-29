@@ -1,26 +1,21 @@
 #Inspiration
-Losing memory isn't something fun to anyone. In United State, Alzhemier's diease is vrey common. Statistics shows that there are are more than 3 million cases per year, and we still have no idea how to cure this disease. Although we haven't found a way to cure Alzhemier's disease, research shows that explosing patients to photos from the past and their favorate musics of their age can spark the memory and have retrieve some of the losing memory. We are trying to employ newest technology to help people suffering memory loss to retrieve memories back.
+Losing memory isn't fun for anyone. In the United State, Alzhemier's diease is very common. Statistics shows that there are more than 3 million cases per year, and we still have no idea how to cure this disease. However, research shows that exposing patients to photos from the past and the most famous songs of their age can spark their memory and help retrieve some of their failing memory. We are trying to employ new technology to help people suffering memory loss to retrieve back their memory.
 
 #What it does
-jide.life is an VR showcase app to 
+jide.life is an VR showcase app for people to immurse in the past memory and help improve the memory of the user. jide.life retrieve data from the user's facebook, spotify, and past news data form the past memories of a user. When the app starts running, it will display user's photo in the front, play user's favorate music of his/her age on the left, and show some pieces of past news headlines on the right. User can click on each of them to switch to content. Sitting inside such a environment, the user will experience the flashback of memory and able to recall things from the edge of memory.
 
-Brush Hero
-As a child, we all brushed less than the recommended 2 minutes just because brushing is boring. We hoped to make it exciting by having children brush in rhythm. We only demoed quarter notes but that could easily be replaced with a Let It Go or whatever the child wants.
+#How we built it
+We employed the brand new WebVR framework as the platform of our app, and used three.js to make awesome 3D modeling in the app. By using moblie technology, we can easily make our app compatiable to most of the VR devices including Oculus Rift, Samsung Gear VR, Google Cardboard, and etc. For the API call, we entirely abandoned server-size of the app, making all the API call running on the client side by Ajax. This practice minimized the cost of the application and gave users more flexibilities.
 
-Brush Hero also includes a monster fighting component. We developed an algorithm that rates brushing on a 1-10 scale in three categories (taken directly from the scientific literature): did they brush 2 minutes, was the brush at a 45 degree angle and did they spend roughly 30 seconds in every quadrant of the mouth. The higher the score is, the smaller the monster gives. Since the algorithm contains a time component, the real goal is to manage your quality/sec. That forces kids to get that 45 degree angle and brush for the full 2 minutes.
 
-Analytics Software
-While Brush Hero is fun, we also provide a more buttoned up analytics software. It rates your brushing and provides indications where you brush the most.
+#Challenges we ran into
+Both of us don't have any prior expreience with VR programming or javascript 3D modeling, so the project is whole new to us. We need to learn things in a very short time and use them to design the product. It can be expected that we are facing a lot of challenges in the procedure. For example, since the WebVR is a very new member in the VR technology, we can't find much totorials and examples on the internet. We had trouble linking the Oculus Rift to the WebVR. We fixed the problem by a number of trials. Also, since we don't have a pair of specially designed controller for Oculus Rift, we can't find any good ways to interact with the VR device, so we come up with the idea to use remote mouse to achieve the interactions.
 
-How we built it
-We developed the tracking software with a lovely library called tracking.js. The process behind developing tracking started with a basic "can it recognize a specific color" but quickly multiplied in complexity. Colors are not consistent to a camera (even if it was looking for a unicolor object, which was basically not the case) over time so we developed more and more complex calibration algorithms that would look for the correct color.
+#Accomplishments that we're proud of
+We successfully made a well developed app with in a small amount of time with a large range of application and influence. The emotional and social benefits of the app are beyond people's imagination.
 
-Once we told tracking.js what to look for (usually a neon band we wrapped around the brush), it would show us with a little rectangle on screen what it was "looking" for. We exported that data for use in both
+#What we learned
+We learned how to use three.js and WebVR to make really fantastic 3D model and 
 
-Challenges we ran into
-We constantly faced calibration issues. We chose to use tracking.js's color detection features because it involves less matrix math on our end than detecting the edges. The problem is colors change over the day (especially with all the natural light in here) and, more disconcertingly, they change with hardware. We did our best to make our app compatible witn as much as we could from a Nexus 6P to an iPhone 7 to an old 2 megapixel webcam.
-
-Accomplishments that we're proud of
-What we learned
-What's next for Brush Brush Revolution
-Built With
+#What's next for Brush Brush Revolution
+#Built With
