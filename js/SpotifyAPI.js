@@ -86,7 +86,7 @@ var musicTopTracksPreviewList = [];
               document.getElementById('spotify-login-button').addEventListener('click', function() {
     
                 var client_id = '19708ad4732b4e458c565a7ef23a228c'; // Your client id
-                var redirect_uri = 'http://localhost:8000/'; // Your redirect uri
+                var redirect_uri = window.location.href; // Your redirect uri
     
                 var state = generateRandomString(16);
     
