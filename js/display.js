@@ -80,10 +80,9 @@ function init(font) {
 
   // img
   var src = (arrOfWebpImages.length != 0) ? arrOfWebpImages[imageiterator][
-   "images"
-   ][0]
-   ["source"] : "../textures/dog.jpg";
-  //var src = "/textures/dog.jpg";
+      "images"
+    ][0]
+    ["source"] : "../textures/dog.jpg";
   var imgtex = texloader.load(src);
   var width = 24,
     height = 13.5,
@@ -183,7 +182,6 @@ function init(font) {
   camera.add(audiolistener);
   sound = new THREE.PositionalAudio(audiolistener);
   audioLoader = new THREE.AudioLoader();
-  //var track = "/audio/dragon.mp3";
   var track = musicTopTracksPreviewList[sounditer];
   audioLoader.load(
     track,
@@ -293,11 +291,10 @@ function init(font) {
   });
 
   // EFFECT
-  effect = new THREE.VREffect(renderer);
+  // effect = new THREE.VREffect(renderer);
 
   // CONTROLS
   // LOOK AROUND
-  // orbital
   control.target.set(
     camera.position.x + 0.15, camera.position.y, camera.position
     .z);
@@ -362,7 +359,8 @@ function animate() {
   pointLight.position.y = Math.cos(time * 3) * 0.5 + 5;
   truckpl.position.x = Math.cos(time * 3) * 2;
 
-  effect.render(scene, camera);
+  THREE.VRController.update();
+  // effect.render(scene, camera);
 
   changeCanvas();
   texture.needsUpdate = true;
@@ -396,28 +394,28 @@ function onDocumentMouseDown(event) {
   raycaster.setFromCamera(mouse, camera);
   var intersects = raycaster.intersectObjects(scene.children, true);
   if (intersects.length > 0) {
-     if (arrOfWebpImages.length != 0 && intersects[0].object == imgmesh) {
-       imageiterator = (imageiterator + 1) % arrOfWebpImages.length;
-       var src = arrOfWebpImages[imageiterator]["images"][0]["source"];
-       var imgtex = texloader.load(src);
-       var imgmat = new THREE.MeshBasicMaterial({
-         map: imgtex
-       });
-       intersects[0].object.material = imgmat;
-     }
-     if (musicTopTracksPreviewList.length != 0 && intersects[0].object.parent.uuid ==
-       radioid) {
-       sounditer = (sounditer + 1) % musicTopTracksPreviewList.length;
-       var track = musicTopTracksPreviewList[sounditer];
-       sound.stop();
-       audioLoader.load(
-         track,
-         function(buffer) {
-           sound.setBuffer(buffer);
-           sound.setRefDistance(20);
-           sound.play();
-         });
-     }
+    if (arrOfWebpImages.length != 0 && intersects[0].object == imgmesh) {
+      imageiterator = (imageiterator + 1) % arrOfWebpImages.length;
+      var src = arrOfWebpImages[imageiterator]["images"][0]["source"];
+      var imgtex = texloader.load(src);
+      var imgmat = new THREE.MeshBasicMaterial({
+        map: imgtex
+      });
+      intersects[0].object.material = imgmat;
+    }
+    if (musicTopTracksPreviewList.length != 0 && intersects[0].object.parent.uuid ==
+      radioid) {
+      sounditer = (sounditer + 1) % musicTopTracksPreviewList.length;
+      var track = musicTopTracksPreviewList[sounditer];
+      sound.stop();
+      audioLoader.load(
+        track,
+        function(buffer) {
+          sound.setBuffer(buffer);
+          sound.setRefDistance(20);
+          sound.play();
+        });
+    }
   }
 }
 
@@ -430,3 +428,82 @@ var onProgress = function(xhr) {
 };
 
 var onError = function(xhr) {};
+
+//  Does this browser support the WebVR API?
+//  Here’s how to download and configure one that does:
+//  https://webvr.rocks
+WEBVR.checkAvailability().catch(function(message) {
+  document.body.appendChild(WEBVR.getMessageContainer(message))
+})
+
+//  This button is important. It toggles between normal in-browser view
+//  and the brand new WebVR in-your-goggles view!
+WEBVR.getVRDisplay(function(display) {
+  renderer.vr.setDevice(display)
+  document.body.appendChild(WEBVR.getButton(display, renderer.domElement))
+})
+
+//  Check this out: When THREE.VRController finds a new controller
+//  it will emit a custom “vr controller connected” event on the
+//  global window object. It uses this to pass you the controller
+//  instance and from there you do what you want with it.
+window.addEventListener('vr controller connected', function(event) {
+  //  Here it is, your VR controller instance.
+  //  It’s really a THREE.Object3D so you can just add it to your scene:
+  var controller = event.detail
+  scene.add(controller)
+  //  HEY HEY HEY! This is important. You need to make sure you do this.
+  //  For standing experiences (not seated) we need to set the standingMatrix
+  //  otherwise you’ll wonder why your controller appears on the floor
+  //  instead of in your hands! And for seated experiences this will have no
+  //  effect, so safe to do either way:
+  controller.standingMatrix = renderer.vr.getStandingMatrix()
+  //  And for 3DOF (seated) controllers you need to set the controller.head
+  //  to reference your camera. That way we can make an educated guess where
+  //  your hand ought to appear based on the camera’s rotation.
+  controller.head = window.camera
+  //  Right now your controller has no visual.
+  //  It’s just an empty THREE.Object3D.
+  //  Let’s fix that!
+  var
+    meshColorOff = 0xDB3236, //  Red.
+    meshColorOn = 0xF4C20D, //  Yellow.
+    controllerMaterial = new THREE.MeshStandardMaterial({
+      color: meshColorOff
+    }),
+    controllerMesh = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.005, 0.05, 0.1, 6),
+      controllerMaterial
+    ),
+    handleMesh = new THREE.Mesh(
+      new THREE.BoxGeometry(0.03, 0.1, 0.03),
+      controllerMaterial
+    )
+  controllerMaterial.flatShading = true
+  controllerMesh.rotation.x = -Math.PI / 2
+  handleMesh.position.y = -0.05
+  controllerMesh.add(handleMesh)
+  controller.userData.mesh = controllerMesh //  So we can change the color later.
+  controller.add(controllerMesh)
+  castShadows(controller)
+  receiveShadows(controller)
+  //  Allow this controller to interact with DAT GUI.
+  var guiInputHelper = dat.GUIVR.addInputObject(controller)
+  scene.add(guiInputHelper)
+  //  Button events. How easy is this?!
+  //  We’ll just use the “primary” button -- whatever that might be ;)
+  //  Check out the THREE.VRController.supported{} object to see
+  //  all the named buttons we’ve already mapped for you!
+  controller.addEventListener('primary press began', function(event) {
+    event.target.userData.mesh.material.color.setHex(meshColorOn)
+    guiInputHelper.pressed(true)
+  })
+  controller.addEventListener('primary press ended', function(event) {
+    event.target.userData.mesh.material.color.setHex(meshColorOff)
+    guiInputHelper.pressed(false)
+  })
+  //  Daddy, what happens when we die?
+  controller.addEventListener('disconnected', function(event) {
+    controller.parent.remove(controller)
+  })
+})
