@@ -7,6 +7,8 @@ var imageiterator = 0;
 var sounditer = 0;
 var radioid;
 var audiolistener, sound, audioLoader;
+var spotLight1, spotLight1Helper;
+var pointLight;
 
 var renderer = new THREE.WebGLRenderer({
   antialias: true
@@ -17,7 +19,7 @@ var control = new THREE.OrbitControls(camera, element);
 var scene = new THREE.Scene();
 var origin = new THREE.Object3D();
 
-var recLight, recLightHelper;
+var recLight, recLightHelper, truckpl;
 
 var manager = new THREE.LoadingManager();
 var texloader = new THREE.TextureLoader(manager);
@@ -88,24 +90,21 @@ function init(font) {
     height_segments = 100;
   imggeo = new THREE.PlaneGeometry(width, height, width_segments,
     height_segments);
-  // for (var i = 0; i < imggeo.vertices.length / 2; i++) {
-  //   imggeo.vertices[2 * i].z = Math.pow(2, i / 20);
-  //   imggeo.vertices[2 * i + 1].z = Math.pow(2, i / 20);
-  // }
-  // var imggeo = new THREE.PlaneBufferGeometry(192, 108);
   var imgmat = new THREE.MeshStandardMaterial({
     map: imgtex,
     polygonOffset: true
   });
   imgmesh = new THREE.Mesh(imggeo, imgmat);
-  // imgmesh.doubleSided = true;
-  // imgmesh.rotation.y = Math.PI / 2 - 0.5;
-  // 50 seems to push it up to the bottom edge
   imgmesh.position.set(0, 6, -24.9);
   imgmesh.castShadow = true;
   imgmesh.receiveShadow = true;
   scene.add(imgmesh);
-
+  // img lighting
+  rectLight = new THREE.RectAreaLight(0xffffff, 100, 24, 13.5);
+  rectLight.position.set(0, 6, -25);
+  rectLightHelper = new THREE.RectAreaLightHelper(rectLight);
+  scene.add(rectLightHelper);
+  scene.add(rectLight);
 
   // floor flr
   var floorMat = new THREE.MeshStandardMaterial({
@@ -144,22 +143,10 @@ function init(font) {
   floorMesh.rotation.x = -Math.PI / 2.0;
   scene.add(floorMesh);
 
-
-  // sky
-  var skygeo = new THREE.SphereGeometry(10000, 32, 32);
-  var skytex = texloader.load('../textures/sky.jpg');
-  skytex.anistropy = renderer.getMaxAnistropy;
-  var skymat = new THREE.MeshStandardMaterial({
-    map: skytex
-  });
-  var skymesh = new THREE.Mesh(skygeo, skymat);
-  skymesh.material.side = THREE.BackSide;
-  scene.add(skymesh);
-
   // DEVELOPMENT TEXTURES
   // spl
   var splgeo = new THREE.BoxGeometry(1, 1, 1);
-  var splmat = new THREE.MeshBasicMaterial({
+  var splmat = new THREE.MeshStandardMaterial({
     color: 0x000000
   });
   splmesh = new THREE.Mesh(splgeo, splmat);
@@ -167,7 +154,7 @@ function init(font) {
   scene.add(splmesh);
   // spl
   var splgeo = new THREE.BoxGeometry(1, 1, 1);
-  var splmat = new THREE.MeshBasicMaterial({
+  var splmat = new THREE.MeshStandardMaterial({
     color: 0xFF0000
   });
   splmesh = new THREE.Mesh(splgeo, splmat);
@@ -175,7 +162,7 @@ function init(font) {
   scene.add(splmesh);
   // spl
   var splgeo = new THREE.BoxGeometry(1, 1, 1);
-  var splmat = new THREE.MeshBasicMaterial({
+  var splmat = new THREE.MeshStandardMaterial({
     color: 0x00FF00
   });
   splmesh = new THREE.Mesh(splgeo, splmat);
@@ -183,7 +170,7 @@ function init(font) {
   scene.add(splmesh);
   // spl
   var splgeo = new THREE.BoxGeometry(1, 1, 1);
-  var splmat = new THREE.MeshBasicMaterial({
+  var splmat = new THREE.MeshStandardMaterial({
     color: 0x0000FF
   });
   splmesh = new THREE.Mesh(splgeo, splmat);
@@ -205,8 +192,20 @@ function init(font) {
     });
 
   // OBJECTS
+  spotLight1 = new THREE.SpotLight(0x404040, 1, 0, Math.PI, 1);
+  spotLight1.intensity = 30;
+  spotLight1.position.set(-5, 15, -15);
+  spotLight1.target.position.set(16, 4, 0);
+  spotLight1.angle = 0.3;
+  spotLight1.castShadow = true;
+  spotLight1.shadow.mapSize.width = 1;
+  spotLight1.shadow.mapSize.height = 1;
+  spotLight1.shadow.camera.near = 1;
+  spotLight1.shadow.camera.far = 100;
+  spotLight1.shadow.camera.fov = 3;
+  scene.add(spotLight1.target);
+  scene.add(spotLight1);
   THREE.Loader.Handlers.add(/\.dds$/i, new THREE.DDSLoader());
-  // man
   var manmtlLoader = new THREE.MTLLoader();
   manmtlLoader.setPath('./obj/male02/');
   manmtlLoader.load('male02_dds.mtl', function(materials) {
@@ -223,7 +222,16 @@ function init(font) {
       scene.add(object);
     }, onProgress, onError);
   });
+
   // radio
+  var plsphere = new THREE.SphereGeometry(0.2, 0.2, 0.2);
+  pointLight = new THREE.PointLight(0xffffff, 0.4, 10);
+  pointLight.add(new THREE.Mesh(plsphere, new THREE.MeshBasicMaterial({
+    color: 0xffffff
+  })));
+  pointLight.position.set(-11, 10, -2);
+  scene.add(pointLight);
+
   var radioobjloader = new THREE.OBJLoader();
   radioobjloader.setPath('./obj/pocket/');
   radioobjloader.load('RT711.obj', function(object) {
@@ -237,6 +245,13 @@ function init(font) {
     radioid = object.uuid;
   }, onProgress, onError);
   // truck
+  var trucksphere = new THREE.SphereGeometry(0.1, 0.1, 0.1);
+  truckpl = new THREE.PointLight(0xffffff, 0.4, 10);
+  truckpl.add(new THREE.Mesh(trucksphere, new THREE.MeshBasicMaterial({
+    color: 0xffffff
+  })));
+  truckpl.position.set(0, 2, 20);
+  scene.add(truckpl);
   var truckmtlloader = new THREE.MTLLoader();
   truckmtlloader.setPath('./obj/red-pickup/');
   truckmtlloader.load('pickup.mtl', function(materials) {
@@ -255,7 +270,7 @@ function init(font) {
   });
   // news
   texture = new THREE.Texture(canvas);
-  var material = new THREE.MeshBasicMaterial({
+  var material = new THREE.MeshStandardMaterial({
     map: texture
   });
   geometry = new THREE.PlaneGeometry(12, 12);
@@ -264,16 +279,6 @@ function init(font) {
   mesh.rotation.y = 3 * Math.PI / 2;
   scene.add(mesh);
   canvas.width = canvas.height = size;
-
-
-  // LIGHTING
-  rectLight = new THREE.RectAreaLight(0xffffff, 1000, 24, 13.5);
-  rectLight.position.set(0, 6, -25);
-  rectLightHelper = new THREE.RectAreaLightHelper(rectLight);
-  scene.add(rectLightHelper);
-  scene.add(rectLight);
-  var ambient = new THREE.AmbientLight(0x101010);
-  scene.add(ambient);
 
   // particle
   particleMaterial = new THREE.SpriteCanvasMaterial({
@@ -349,14 +354,13 @@ function onWindowResize() {
 
 function animate() {
   requestAnimationFrame(animate);
+  var time = Date.now() * 0.0005;
+  pointLight.position.y = Math.cos(time * 3) * 0.5 + 5;
+  truckpl.position.x = Math.cos(time * 3) * 2;
+
   changeCanvas();
   texture.needsUpdate = true;
   renderer.render(scene, camera);
-}
-
-function render() {
-  recLightHelper.update();
-  rnd.render(scn, cam);
 }
 
 // https://github.com/sitepoint-editors/VRWeatherParticles/blob/master/index.html
