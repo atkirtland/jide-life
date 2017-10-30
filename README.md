@@ -4,7 +4,7 @@ Losing memory isn't fun for anyone. In the United States, Alzhemier's diease is 
 
 # What it does
 
-jide.life is an VR showcase app for people to immerse in their past memories and to help users imrpove their personal recollection of the past. jide.life retrieves data from the user's Facebook and Spotify and from past news data to form a collection of a user's memory. When the app runns, it displays the user's photo in the front, plays the user's favorate music of his/her youth on the left, and shows some pieces of past news headlines on the right. Users can click on each of them to switch the content. Sitting inside such a environment, the user will experience a flashback of memory and will be able to recall things from their distant memories.
+jide.life is an VR showcase app for people to immerse in their past memories and to help users imrpove their personal recollection of the past. jide.life retrieves data from the user's Facebook and Spotify and from past news data to form a collection of a user's memory. When the app runs, it displays the user's photo in the front, plays the user's favorate music of his/her youth on the left, and shows some pieces of past news headlines on the right. Users can click on each of them to switch the content. Sitting inside such a environment, the user will experience a flashback of memory and will be able to recall things from their distant memories.
 
 # How we built it
 
@@ -12,7 +12,7 @@ We employed the brand new WebVR framework as the platform of our app, and used t
 
 # Challenges we ran into
 
-Neither of us had prior experience with VR programming or 3D modeling in Javascript, so the project was wholly new to us. We needed to learn things in a very short time and use them to design the product. For example, since the application of WebVR for the Oculus Rift is a very new idea in the VR market, we couldn't find many tutorials or examples on the internet. We thus had mild difficulty linking the Oculus Rift to WebVR and the web browser. We solved this issue after much trial and erro. Additionally, since we didn't have a pair of specially designed controllers for Oculus Rift, we could't find any great ways to interact with the VR device. Thus, we came up with the idea to use looking at objects and clicking a wireless mouse as a substitute for a controller.
+Neither of us had any prior experience with VR programming or 3D modeling in Javascript, so the project was wholly new to us. We needed to learn things in a very short time and use them to design the product. For example, since the application of WebVR for the Oculus Rift is a very new idea in the VR market, we couldn't find many tutorials or examples on the internet. We thus had mild difficulty linking the Oculus Rift to WebVR and the web browser. We solved this issue after much trial and erro. Additionally, since we didn't have a pair of specially designed controllers for Oculus Rift, we could't find any great ways to interact with the VR device. Thus, we came up with the idea to use looking at objects and clicking a wireless mouse as a substitute for a controller.
 
 # Accomplishments that we're proud of
 
